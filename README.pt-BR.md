@@ -29,7 +29,7 @@ dashboard e histórico.
 > Não é uma ferramenta de diagnóstico médico.** Não use para decisões clínicas.
 
 ---
-
+![alt text](docs/image.png)
 ## Sumário
 
 - [Visão geral](#visão-geral)

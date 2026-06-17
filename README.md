@@ -30,7 +30,7 @@ history.
 > decisions.
 
 ---
-
+![alt text](docs/image.png)
 ## Table of contents
 
 - [Project overview](#project-overview)
@@ -51,7 +51,6 @@ history.
 ---
 
 ## Project overview
-
 A user uploads a chest X-ray image. The API validates it, stores it, creates an
 `Analysis` record with status `PENDING`, and dispatches an async task to a
 **Celery** worker via **RabbitMQ**. The worker runs the AI pipeline (image
