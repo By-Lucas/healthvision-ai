@@ -2,10 +2,73 @@ import { Link } from 'react-router-dom';
 import { Card } from '@/shared/components/Card';
 import { DisclaimerBanner } from '@/shared/components/DisclaimerBanner';
 
-const techStack = [
-  'Python', 'FastAPI', 'SQLAlchemy (async)', 'PostgreSQL', 'Celery', 'RabbitMQ',
-  'PyTorch-ready', 'OpenCV', 'React', 'TypeScript', 'Vite', 'React Query',
-  'Zustand', 'TailwindCSS', 'Recharts', 'Docker',
+const techGroups: { title: string; items: string[] }[] = [
+  {
+    title: 'Backend',
+    items: [
+      'Python 3.11',
+      'FastAPI',
+      'SQLAlchemy (async)',
+      'PostgreSQL',
+      'Alembic',
+      'Pydantic',
+    ],
+  },
+  {
+    title: 'AI / ML',
+    items: [
+      'PyTorch',
+      'torchxrayvision',
+      'OpenCV',
+      'Pillow',
+      'NumPy',
+      'Pandas',
+      'scikit-learn',
+    ],
+  },
+  {
+    title: 'Async & messaging',
+    items: ['Celery', 'RabbitMQ'],
+  },
+  {
+    title: 'Frontend',
+    items: [
+      'React 18',
+      'TypeScript',
+      'Vite',
+      'React Query',
+      'Zustand',
+      'React Router',
+      'TailwindCSS',
+      'Recharts',
+    ],
+  },
+  {
+    title: 'Architecture & services',
+    items: [
+      'Clean Architecture',
+      'Hexagonal (Ports & Adapters)',
+      'Light DDD',
+      'Async worker service',
+      'REST API',
+      'Feature-sliced frontend',
+    ],
+  },
+  {
+    title: 'Testing',
+    items: ['Pytest', 'Vitest', 'Testing Library', 'Playwright'],
+  },
+  {
+    title: 'DevOps & CI/CD',
+    items: [
+      'Docker',
+      'Docker Compose',
+      'GitHub Actions',
+      'Makefile',
+      'Nginx',
+      'AWS-ready',
+    ],
+  },
 ];
 
 const steps = [
@@ -69,15 +132,28 @@ export function HomePage() {
       <DisclaimerBanner />
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-slate-900">Technology stack</h2>
-        <div className="flex flex-wrap gap-2">
-          {techStack.map((t) => (
-            <span
-              key={t}
-              className="rounded-md border border-slate-200 bg-white px-3 py-1 text-sm text-slate-600"
-            >
-              {t}
-            </span>
+        <h2 className="mb-1 text-lg font-semibold text-slate-900">Technology stack</h2>
+        <p className="mb-5 text-sm text-slate-500">
+          Architecture, services, AI, frontend, testing and CI/CD — the full
+          engineering surface of the project.
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {techGroups.map((group) => (
+            <Card key={group.title} className="p-4">
+              <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-brand-700">
+                {group.title}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-600"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </Card>
           ))}
         </div>
       </section>
