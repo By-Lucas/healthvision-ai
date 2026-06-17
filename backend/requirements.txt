@@ -1,0 +1,32 @@
+# --- Web framework ---
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.17
+pydantic==2.10.3
+pydantic-settings==2.6.1
+
+# --- Database ---
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+alembic==1.14.0
+
+# --- Async task queue ---
+celery==5.4.0
+kombu==5.4.2
+
+# --- AI / image / data ---
+numpy==2.1.3
+pandas==2.2.3
+pillow==11.0.0
+opencv-python-headless==4.10.0.84
+scikit-learn==1.5.2
+
+# --- Real AI model (installed in the Docker image, not here) ---
+# The real chest X-ray classifier uses torchxrayvision + a CPU build of torch.
+# These are installed by backend/Dockerfile (CPU wheels, ~hundreds of MB) so
+# they don't bloat CI unit tests, which run against the deterministic mock.
+# To run the real model outside Docker:
+#   pip install --index-url https://download.pytorch.org/whl/cpu torch==2.4.1 torchvision==0.19.1
+#   pip install torchxrayvision==1.2.1 scikit-image
+#   export USE_MOCK_INFERENCE=false

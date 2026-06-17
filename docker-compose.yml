@@ -1,0 +1,88 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-healthvision}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-healthvision}
+      POSTGRES_DB: ${POSTGRES_DB:-healthvision}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-healthvision}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # management UI
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-healthvision}:${POSTGRES_PASSWORD:-healthvision}@postgres:5432/${POSTGRES_DB:-healthvision}
+      SYNC_DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-healthvision}:${POSTGRES_PASSWORD:-healthvision}@postgres:5432/${POSTGRES_DB:-healthvision}
+      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+      STORAGE_DIR: /data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - uploads:/data/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    # Wait for the DB, apply migrations, then start the API.
+    command: >
+      sh -c "python -m scripts.wait_for_db &&
+             alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  celery_worker:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-healthvision}:${POSTGRES_PASSWORD:-healthvision}@postgres:5432/${POSTGRES_DB:-healthvision}
+      SYNC_DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-healthvision}:${POSTGRES_PASSWORD:-healthvision}@postgres:5432/${POSTGRES_DB:-healthvision}
+      CELERY_BROKER_URL: amqp://guest:guest@rabbitmq:5672//
+      STORAGE_DIR: /data/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - uploads:/data/uploads
+    # Wait for the DB before booting the worker (it persists results there).
+    command: >
+      sh -c "python -m scripts.wait_for_db &&
+             celery -A worker.celery_app worker --loglevel=info --concurrency=2"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:80"
+
+volumes:
+  pgdata:
+  uploads:

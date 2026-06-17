@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+playwright-report/
+test-results/
+
+# Env / secrets
+.env
+
+# Data / uploads
+backend/data/
+data/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
